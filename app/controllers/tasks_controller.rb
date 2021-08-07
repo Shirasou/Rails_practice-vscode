@@ -1,7 +1,8 @@
 class TasksController < ApplicationController
   before_action :set_task, only: [:show, :edit, :update, :destroy]
   def index
-    @tasks = current_user.tasks.order(created_at: :desc)
+    @q = current_user.tasks.ransack(params[:q])
+    @tasks = @q.result(distinct: true)
   end
 
   def show
@@ -11,9 +12,19 @@ class TasksController < ApplicationController
     @task = Task.new
   end
 
+  def confirm_new
+    @task = current_user.tasks.new(task_params)
+    render :new unless @task.valid?
+  end
+
   def create
     @task = current_user.tasks.new(task_params)
-    if @task.save
+
+    if params[:back].present?
+      render :new
+      return
+    end
+      if @task.save
       redirect_to @task, notice: "タスク「#{@task.name}」を登録しました。"
     else
       render :new
@@ -32,12 +43,6 @@ class TasksController < ApplicationController
     @task.destroy
     redirect_to tasks_url, notice: "タスク「#{@task.name}」を削除しました。"
   end
-
-  def task_logger
-    @task_logger ||= Logger.new('log/task.log', 'daily')
-  end
-
-  task_logger.debug 'taskのログを出力'
 
   private
 
