@@ -33,7 +33,7 @@ Rails.application.configure do
   # Don't care if the mailer can't send.
   config.action_mailer.raise_delivery_errors = false
   config.action_mailer.delivery_method = :smtp
-  config.action_mailer.smtp_settings = { address: '127.0.0.1', port: 1025 }
+  config.action_mailer.smtp_settings = { address: "127.0.0.1", port: 1025 }
 
   config.action_mailer.perform_caching = false
 
@@ -63,4 +63,6 @@ Rails.application.configure do
   config.logger = Logger.new("log/development.log", "daily")
   config.custom_logger = Logger.new("log/custom.log", "weekly")
   config.logger.formatter = proc { |severity, timestamp, progname, message| "#{timestamp} :#{severity}: #{message}\n" }
+
+  config.active_job.queue_adapter = :sidekiq
 end
